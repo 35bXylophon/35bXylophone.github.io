@@ -74,31 +74,31 @@ document
 
     trigger.addEventListener("change", () => {
 
+      const group = trigger.dataset.group;
+
+      // Alle Trigger dieser Gruppe sammeln
+      const groupTriggers = document.querySelectorAll(
+      `.trigger-ai[data-group="${group}"]`
+      );
+
       // Zielcontainer bestimmen
       const target =
         document.getElementById(
           trigger.dataset.target
         );
 
+      const allValid = Array.from(groupTriggers).every(t =>
+      t.value === "3" || t.value === "4"
+      );
       // Gute Antworten
-      if(
-        trigger.value === "3" ||
-        trigger.value === "4"
-      ){
-
-        target.classList.remove("hidden");
-
+      if (allValid) {
+      target.classList.remove("hidden");
       } else {
+      target.classList.add("hidden");
 
-        // KI-Fragen ausblenden
-        target.classList.add("hidden");
-
-        // Werte zurücksetzen
-        target
-          .querySelectorAll("select")
-          .forEach(s => {
-
-            s.value = "";
+      // Werte zurücksetzen
+      target.querySelectorAll("select").forEach(s => {
+        s.value = "";
 
           });
       }
