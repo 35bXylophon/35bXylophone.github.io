@@ -19,9 +19,6 @@ const required =
 let radarChart;
 let barChart;
 
-console.log("Group 3 triggers:", document.querySelectorAll('.trigger-ai[data-group="3"]').length);
-
-
 // =====================================================
 // AMPELSYSTEM
 // Bewertet Fragen farblich
