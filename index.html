@@ -706,53 +706,6 @@ CSV / Excel Export
 
 </div>
 
-<script>
-
-const selects = document.querySelectorAll("select");
-const required = document.querySelectorAll(".required");
-
-selects.forEach(select => {
-
-  select.addEventListener("change", () => {
-
-    const question = select.closest(".question");
-
-    question.classList.remove("good","medium","bad");
-
-    if(select.value === "4"){
-      question.classList.add("good");
-    } else if(select.value === "3"){
-      question.classList.add("medium");
-    } else if(select.value === "1" || select.value === "2"){
-      question.classList.add("bad");
-    }
-
-    updateDashboard();
-  });
-
-});
-
-document.querySelectorAll(".trigger-ai").forEach(trigger => {
-
-  trigger.addEventListener("change", () => {
-
-    const target = document.getElementById(trigger.dataset.target);
-
-    if(trigger.value === "3" || trigger.value === "4"){
-      target.classList.remove("hidden");
-    } else {
-      target.classList.add("hidden");
-
-      target.querySelectorAll("select").forEach(s=>{
-        s.value="";
-      });
-    }
-
-    updateDashboard();
-  });
-
-});
-
 function updateDashboard(){
 
   const visibleRequired = [...required]
