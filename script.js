@@ -1,4 +1,3 @@
-console.log("SCRIPT LOADED");
 // =====================================================
 // DIGI-CO QUICKCHECK
 // SCRIPT.JS
