@@ -221,7 +221,31 @@ canvas{
 <h2>A. Lieferanten & Partner</h2>
 
 <div class="question">
-<label>A1 Digitale Bestellungen</label>
+<label>A1 Bestellungen oder Liefervorankündigungen von Lieferanten werden digital empfangen und automatisch verarbeitet</label>
+
+<select class="required trigger-ai" data-target="a-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>A2 Artikel- und Preisdaten werden mit Lieferanten digital synchronisiert (z. B. über EDI, Portal oder API)</label>
+
+<select class="required trigger-ai" data-target="a-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>A3 Der Prozess für die technische Anbindung neuer Partner (Onboarding) ist standardisiert und dokumentiert</label>
 
 <select class="required trigger-ai" data-target="a-ai">
 <option value="">Bitte wählen</option>
@@ -235,7 +259,7 @@ canvas{
 <div id="a-ai" class="hidden">
 
 <div class="question">
-<label>A4 KI Dokumentenerkennung</label>
+<label>A4 Wir nutzen KI, um Eingangsbelege und Dokumente von Lieferanten (z. B. Rechnungen, Lieferscheine, Zertifikate) automatisch zu erkennen, auszulesen und den richtigen Vorgängen zuzuordnen.</label>
 
 <select class="required">
 <option value="">Bitte wählen</option>
@@ -248,7 +272,19 @@ canvas{
 </div>
 
 <div class="question">
-<label>A5 KI Risikoerkennung</label>
+<label>A5 Wir nutzen KI, um Abweichungen und Risiken in der Beschaffung früh zu erkennen (z. B. Preisabweichungen, Lieferverzug, Qualitätsprobleme) und geeignete Maßnahmen vorzuschlagen</label>
+
+<select class="required">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>A6 Wir nutzen KI, um Bedarfe und Bestellvorschläge zu unterstützen (z. B. Prognosen, Sicherheitsbestände, Alternative Lieferanten)</label>
 
 <select class="required">
 <option value="">Bitte wählen</option>
@@ -268,7 +304,31 @@ canvas{
 <h2>B. Interne Systeme</h2>
 
 <div class="question">
-<label>B1 Automatischer Datenaustausch</label>
+<label>B1 B1 Kernsysteme (z. B. ERP, CRM, Produktion, Lager) tauschen Daten automatisch über Schnittstellen aus.</label>
+
+<select class="required trigger-ai" data-target="b-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>B2 Geschäftsprozesse laufen vom Auftrag bis zur Rechnung weitgehend automatisiert durch die Systeme (End-to-End)</label>
+
+<select class="required trigger-ai" data-target="b-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>B3 Die Datenpflege ist zentral geregelt und wird konsistent auf alle betroffenen Systeme verteilt (Stammdaten-Governance).</label>
 
 <select class="required trigger-ai" data-target="b-ai">
 <option value="">Bitte wählen</option>
@@ -282,7 +342,20 @@ canvas{
 <div id="b-ai" class="hidden">
 
 <div class="question">
-<label>B4 KI für Routinetätigkeiten</label>
+<label>B4 Wir nutzen KI, um interne Routinetätigkeiten zu unterstützen oder zu automatisieren (z. B. Zusammenfassungen, Protokolle, Textbausteine, Ticket-Klassifikation)</label>
+
+<select class="required">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+
+</div>
+
+<div class="question">
+<label>B5  Wir nutzen KI, um Datenqualität zu verbessern (z. B. Dubletten erkennen, Plausibilitätsprüfungen, Bereinigungsvorschläge).</label>
 
 <select class="required">
 <option value="">Bitte wählen</option>
@@ -303,7 +376,43 @@ canvas{
 <h2>C. Kunden & Markt</h2>
 
 <div class="question">
-<label>C2 Digitale Kundenaufträge</label>
+<label>C1 Wir kennen alle digitalen Kundenkontaktpunkte und nutzen Sie (Internet, Social Media (z.B. LinkedIn, TikTok etc.)</label>
+
+<select class="required trigger-ai" data-target="c-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>C2 Kunden können Aufträge oder Statusabfragen digital tätigen (z. B. Portal, API oder direkte Anbindung).</label>
+
+<select class="required trigger-ai" data-target="c-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>C3 Versand- und Logistikpartner sind digital angebunden (automatische Übermittlung von Sendungsdaten, Tracking)</label>
+
+<select class="required trigger-ai" data-target="c-ai">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+</div>
+
+<div class="question">
+<label>C4 Rechnungsstellung und Zahlungsabwicklung erfolgen elektronisch und weitgehend automatisch.</label>
 
 <select class="required trigger-ai" data-target="c-ai">
 <option value="">Bitte wählen</option>
@@ -317,7 +426,7 @@ canvas{
 <div id="c-ai" class="hidden">
 
 <div class="question">
-<label>C5 KI Angebotserstellung</label>
+<label>C5 Wir nutzen KI zur Unterstützung der Angebotserstellung (z. B. Entwürfe, Textbausteine, Nutzenargumentation, Vergleich mit ähnlichen Angeboten)</label>
 
 <select class="required">
 <option value="">Bitte wählen</option>
@@ -330,7 +439,20 @@ canvas{
 </div>
 
 <div class="question">
-<label>C6 KI im Marketing</label>
+<label>C6 Wir nutzen KI im Marketing, z. B. für Content-Erstellung, Kampagnenideen, Personalisierung oder Auswertung von Marketingdaten.</label>
+
+<select class="required">
+<option value="">Bitte wählen</option>
+<option value="1">1 - gar nicht</option>
+<option value="2">2 - kaum</option>
+<option value="3">3 - teilweise</option>
+<option value="4">4 - vollständig</option>
+</select>
+
+</div>
+
+<div class="question">
+<label>C6 Wir nutzen KI im Kundenservice (z. B. Antwortvorschläge, Chatbot, Ticket-Klassifikation oder Wissenssuche)</label>
 
 <select class="required">
 <option value="">Bitte wählen</option>
@@ -676,4 +798,3 @@ updateDashboard();
 
 </body>
 </html>
-```
