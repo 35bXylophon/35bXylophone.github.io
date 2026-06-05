@@ -162,6 +162,8 @@ function updateDashboard(){
 
   // Score berechnen
   calculateScore();
+  calculateDigitalScore();
+  calculateAIScore();
 }
 
 // =====================================================
