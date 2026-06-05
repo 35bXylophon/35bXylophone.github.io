@@ -380,29 +380,30 @@ const data = [
 
           data:data
 
+        }]
+      },
+
           options:{
 
-          scales:{
+            scales:{
         
-            r:{
+              r:{
         
-              min:0,
+                min:0,
         
-              max:100,
+                max:100,
         
-              ticks:{
-                stepSize:20
+                ticks:{
+                  stepSize:20
+                }
+        
               }
         
             }
         
           }
-        
-        }
 
-        }]
       }
-    }
   );
 
   // Vorheriges Balkendiagramm löschen
