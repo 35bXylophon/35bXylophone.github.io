@@ -231,7 +231,7 @@ function calculateScore(){
   }
 
   // Diagramme aktualisieren
-  updateCharts(avg);
+  //updateCharts(avg);
 }
 
 function calculateDigitalScore(){
@@ -298,7 +298,7 @@ function calculateDigitalScore(){
   }
 
   // Diagramme aktualisieren
-  updateCharts(avg);
+  //updateCharts(avg);
 }
 
 function calculateAIScore(){
