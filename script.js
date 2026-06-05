@@ -297,6 +297,8 @@ function calculateDigitalScore(){
       "Reifegrad: Hoch";
   }
 
+  // Diagramme aktualisieren
+  updateCharts(avg);
 }
 
 function calculateAIScore(){
@@ -361,7 +363,9 @@ function calculateAIScore(){
     scoreBox.innerText =
       "Reifegrad: Hoch";
   }
-  
+
+  // Diagramme aktualisieren
+  updateCharts(avg);
 }
 
 // =====================================================
