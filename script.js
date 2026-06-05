@@ -237,7 +237,7 @@ function calculateDigitalScore(){
   const digitalQuestions =
 
     document.querySelectorAll(
-      ".digital-question select"
+      ".digital-question"
     );
 
   let values = [];
@@ -270,7 +270,7 @@ function calculateAIScore(){
   const aiQuestions =
 
     document.querySelectorAll(
-      ".ai-question select"
+      ".ai-question"
     );
 
   let values = [];
