@@ -238,11 +238,11 @@ function calculateDigitalScore(){
 
   const digitalQuestions =
 
-    [...document.querySelectorAll(
+    document.querySelectorAll(
       ".digital-question select"
-    )]
+    );
 
-      .filter(
+      /*.filter(
         el => el.offsetParent !== null
       )
 
@@ -253,9 +253,9 @@ function calculateDigitalScore(){
       .filter(
         v => !isNaN(v)
 
-      );
+      );*/
 
-  /*let values = [];
+  let values = [];
 
   digitalQuestions.forEach(select => {
 
@@ -266,7 +266,7 @@ function calculateDigitalScore(){
       );
     }
 
-  });*/
+  });
 
   if(values.length === 0){
 
