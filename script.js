@@ -239,7 +239,7 @@ function calculateDigitalScore(){
   const digitalQuestions =
 
     document.querySelectorAll(
-      ".digital-question"
+      ".digital-question select"
     );
 
   let values = [];
@@ -265,6 +265,38 @@ function calculateDigitalScore(){
     0
   ) / values.length;
 
+// Score-Box
+  const scoreBox =
+    document.getElementById(
+      "digitalScoreBox"
+    );
+
+  // Bewertung
+  if(avg < 2){
+
+    scoreBox.className =
+      "score-box red";
+
+    scoreBox.innerText =
+      "Reifegrad: Niedrig";
+
+  } else if(avg < 3.5){
+
+    scoreBox.className =
+      "score-box yellow";
+
+    scoreBox.innerText =
+      "Reifegrad: Mittel";
+
+  } else {
+
+    scoreBox.className =
+      "score-box green";
+
+    scoreBox.innerText =
+      "Reifegrad: Hoch";
+  }
+
 }
 
 function calculateAIScore(){
@@ -272,7 +304,7 @@ function calculateAIScore(){
   const aiQuestions =
 
     document.querySelectorAll(
-      ".ai-question"
+      ".ai-question select"
     );
 
   let values = [];
@@ -298,6 +330,38 @@ function calculateAIScore(){
     0
   ) / values.length;
 
+// Score-Box
+  const scoreBox =
+    document.getElementById(
+      "aiScoreBox"
+    );
+
+  // Bewertung
+  if(avg < 2){
+
+    scoreBox.className =
+      "score-box red";
+
+    scoreBox.innerText =
+      "Reifegrad: Niedrig";
+
+  } else if(avg < 3.5){
+
+    scoreBox.className =
+      "score-box yellow";
+
+    scoreBox.innerText =
+      "Reifegrad: Mittel";
+
+  } else {
+
+    scoreBox.className =
+      "score-box green";
+
+    scoreBox.innerText =
+      "Reifegrad: Hoch";
+  }
+  
 }
 
 // =====================================================
