@@ -238,11 +238,11 @@ function calculateDigitalScore(){
 
   const values =
 
-    document.querySelectorAll(
+    [...document.querySelectorAll(
       ".digital-question select"
-    );
+    )]
 
-      /*.filter(
+      .filter(
         el => el.offsetParent !== null
       )
 
@@ -253,9 +253,9 @@ function calculateDigitalScore(){
       .filter(
         v => !isNaN(v)
 
-      );*/
+      );
 
-  let values = [];
+  /*let values = [];
 
   digitalQuestions.forEach(select => {
 
@@ -266,7 +266,7 @@ function calculateDigitalScore(){
       );
     }
 
-  });
+  });*/
 
   if(values.length === 0){
 
@@ -318,11 +318,23 @@ function calculateAIScore(){
 
   const values =
 
-    document.querySelectorAll(
+    [...document.querySelectorAll(
       ".ai-question select"
-    );
+    )]
 
-  let values = [];
+        .filter(
+        el => el.offsetParent !== null
+      )
+
+      .map(
+        el => Number(el.value)
+      )
+
+      .filter(
+        v => !isNaN(v)
+
+      );
+  /*let values = [];
 
   aiQuestions.forEach(select => {
 
@@ -333,7 +345,7 @@ function calculateAIScore(){
       );
     }
 
-  });
+  });*/
 
   if(values.length === 0){
 
