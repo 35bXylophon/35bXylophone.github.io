@@ -165,7 +165,7 @@ function updateDashboard(){
 }
 
 // =====================================================
-// REIFEGRAD BERECHNEN
+// REIFEGRADE BERECHNEN
 // =====================================================
 
 function calculateScore(){
@@ -232,6 +232,72 @@ function calculateScore(){
   updateCharts(avg);
 }
 
+function calculateDigitalScore(){
+
+  const digitalQuestions =
+
+    document.querySelectorAll(
+      ".digital-question select"
+    );
+
+  let values = [];
+
+  digitalQuestions.forEach(select => {
+
+    if(select.value){
+
+      values.push(
+        Number(select.value)
+      );
+    }
+
+  });
+
+  if(values.length === 0){
+
+    return 0;
+  }
+
+  return values.reduce(
+    (a,b)=>a+b,
+    0
+  ) / values.length;
+
+}
+
+function calculateAIScore(){
+
+  const aiQuestions =
+
+    document.querySelectorAll(
+      ".ai-question select"
+    );
+
+  let values = [];
+
+  aiQuestions.forEach(select => {
+
+    if(select.value){
+
+      values.push(
+        Number(select.value)
+      );
+    }
+
+  });
+
+  if(values.length === 0){
+
+    return 0;
+  }
+
+  return values.reduce(
+    (a,b)=>a+b,
+    0
+  ) / values.length;
+
+}
+
 // =====================================================
 // DIAGRAMME AKTUALISIEREN
 // =====================================================
@@ -239,15 +305,37 @@ function calculateScore(){
 function updateCharts(avg){
 
   // Bereichswerte berechnen
-  const data = [
+const data = [
 
-    getAverageBySection("A"),
+  normalizeScore(
+    getAverageBySection("0")
+  ),
 
-    getAverageBySection("B"),
+  normalizeScore(
+    getAverageBySection("A")
+  ),
 
+  normalizeScore(
+    getAverageBySection("B")
+  ),
+
+  normalizeScore(
     getAverageBySection("C")
+  ),
 
-  ];
+  normalizeScore(
+    getAverageBySection("D")
+  ),
+
+  normalizeScore(
+    getAverageBySection("E")
+  ),
+
+  normalizeScore(
+    getAverageBySection("F")
+  )
+
+];
 
   // Vorheriges Radar löschen
   if(radarChart){
@@ -269,16 +357,48 @@ function updateCharts(avg){
       data:{
 
         labels:[
-          "Lieferanten",
-          "Interne Systeme",
-          "Kunden"
-        ],
+
+            "Digitalisierungslogik",
+          
+            "Lieferanten",
+          
+            "Interne Systeme",
+          
+            "Kunden & Markt",
+          
+            "Wissensmanagement",
+          
+            "Rahmenbedingungen",
+          
+            "Strategie"
+          
+          ],
 
         datasets:[{
 
           label:"Digitalisierungsgrad",
 
           data:data
+
+          options:{
+
+          scales:{
+        
+            r:{
+        
+              min:0,
+        
+              max:100,
+        
+              ticks:{
+                stepSize:20
+              }
+        
+            }
+        
+          }
+        
+        }
 
         }]
       }
@@ -337,7 +457,7 @@ function updateCharts(avg){
 // DURCHSCHNITT PRO BEREICH
 // =====================================================
 
-function getAverageBySection(letter){
+/*function getAverageBySection(letter){
 
   // Alle Labels sammeln
   const labels =
@@ -377,6 +497,60 @@ function getAverageBySection(letter){
     (a,b)=>a+b,
     0
   ) / values.length;
+}*/
+
+function getAverageBySection(letter){
+
+  const questions =
+
+    document.querySelectorAll(
+      `[data-section="${letter}"]`
+    );
+
+  let values = [];
+
+  questions.forEach(question => {
+
+    const select =
+      question.querySelector("select");
+
+    if(
+      select &&
+      select.value
+    ){
+
+      values.push(
+        Number(select.value)
+      );
+    }
+
+  });
+
+  if(values.length === 0){
+
+    return 0;
+  }
+
+  return values.reduce(
+    (a,b)=>a+b,
+    0
+  ) / values.length;
+
+}
+
+// =====================================================
+// NORMIERUNG
+// 1-4 => 0-100%
+// =====================================================
+
+function normalizeScore(score){
+
+  if(score === 0){
+
+    return 0;
+  }
+
+  return ((score - 1) / 3) * 100;
 }
 
 // =====================================================
