@@ -1,938 +1,505 @@
-//console.log("SCRIPT LOADED");
-// =====================================================
-// DIGI-CO QUICKCHECK
-// SCRIPT.JS
-// =====================================================
+/* =====================================================
+   DIGI-CO QUICKCHECK
+   script.js
+   ===================================================== */
 
-// =====================================================
-// GLOBALE VARIABLEN
-// =====================================================
+/* =====================================================
+   GLOBALE VARIABLEN
+   ===================================================== */
 
-// Alle Select-Felder
-const selects =
-  document.querySelectorAll("select");
+const required = document.querySelectorAll(".required");
 
-// Alle Pflichtfelder
-const required =
-  document.querySelectorAll(".required");
+let radarChart = null;
+let barChart = null;
 
-// Diagramm-Instanzen
-let radarChart;
-let barChart;
+const SECTIONS = ["0", "A", "B", "C", "D", "E", "F"];
 
-// =====================================================
-// AMPELSYSTEM
-// Bewertet Fragen farblich
-// =====================================================
+const SECTION_LABELS = {
+  "0": "Digitalisierungslogik",
+  "A": "Lieferanten",
+  "B": "Interne Systeme",
+  "C": "Kunden & Markt",
+  "D": "Wissensmanagement",
+  "E": "Rahmenbedingungen",
+  "F": "Strategie"
+};
 
-selects.forEach(select => {
+/* =====================================================
+   INITIALISIERUNG
+   ===================================================== */
 
-  select.addEventListener("change", () => {
-
-    // Zugehörige Frage bestimmen
-    const question =
-      select.closest(".question");
-
-    // Vorherige Klassen entfernen
-    question.classList.remove(
-      "good",
-      "medium",
-      "bad"
-    );
-
-    // Bewertung setzen
-    if(select.value === "4"){
-
-      question.classList.add("good");
-
-    } else if(select.value === "3"){
-
-      question.classList.add("medium");
-
-    } else if(
-      select.value === "1" ||
-      select.value === "2"
-    ){
-
-      question.classList.add("bad");
-    }
-
-    // Dashboard aktualisieren
-    updateDashboard();
-
-  });
-
+document.addEventListener("DOMContentLoaded", () => {
+  initAnswerListeners();
+  initAiLogic();
+  updateDashboard();
 });
 
-// =====================================================
-// KI-LOGIK
-// Zeigt KI-Fragen nur bei ausreichender Digitalisierung
-// =====================================================
+/* =====================================================
+   EVENT LISTENER FÜR ANTWORTEN
+   ===================================================== */
 
-document
-  .querySelectorAll(".trigger-ai")
-  .forEach(trigger => {
+function initAnswerListeners() {
+  document.querySelectorAll("select, textarea, input").forEach(element => {
+    element.addEventListener("change", updateDashboard);
+    element.addEventListener("input", updateDashboard);
+  });
 
+  document.querySelectorAll("select").forEach(select => {
+    select.addEventListener("change", () => {
+      updateQuestionColor(select);
+    });
+  });
+}
+
+/* =====================================================
+   AMPELSYSTEM PRO FRAGE
+   ===================================================== */
+
+function updateQuestionColor(select) {
+  const question = select.closest(".question");
+
+  if (!question) return;
+
+  question.classList.remove("good", "medium", "bad");
+
+  const value = Number(select.value);
+
+  if (value === 4) {
+    question.classList.add("good");
+  } else if (value === 3) {
+    question.classList.add("medium");
+  } else if (value === 1 || value === 2) {
+    question.classList.add("bad");
+  }
+}
+
+/* =====================================================
+   KI-FRAGEN-LOGIK
+   KI-Fragen werden sichtbar, wenn Triggerfrage >= 3 ist
+   ===================================================== */
+
+function initAiLogic() {
+  document.querySelectorAll(".trigger-ai").forEach(trigger => {
     trigger.addEventListener("change", () => {
+      const targetId = trigger.dataset.target;
+      const target = document.getElementById(targetId);
 
-      const group = trigger.dataset.group;
-
-      // Alle Trigger dieser Gruppe sammeln
-      const groupTriggers = document.querySelectorAll(
-      `.trigger-ai[data-group="${group}"]`
-      );
-
-      // Zielcontainer bestimmen
-      const target =
-        document.getElementById(
-          trigger.dataset.target
-        );
-
-      const allValid = Array.from(groupTriggers).every(t =>
-      t.value === "3" || t.value === "4"
-      );
-      // Gute Antworten
-      if (allValid) {
-      target.classList.remove("hidden");
-      } else {
-      target.classList.add("hidden");
-
-      // Werte zurücksetzen
-      target.querySelectorAll("select").forEach(s => {
-        s.value = "";
-
-          });
+      if (!target) {
+        console.warn("KI-Zielcontainer nicht gefunden:", targetId);
+        return;
       }
 
-      // Dashboard aktualisieren
+      const score = Number(trigger.value);
+
+      if (score >= 3) {
+        target.classList.remove("hidden");
+      } else {
+        target.classList.add("hidden");
+
+        target.querySelectorAll("select, textarea, input").forEach(field => {
+          if (field.type === "checkbox" || field.type === "radio") {
+            field.checked = false;
+          } else {
+            field.value = "";
+          }
+
+          const question = field.closest(".question");
+          if (question) {
+            question.classList.remove("good", "medium", "bad");
+          }
+        });
+      }
+
       updateDashboard();
-
     });
-
-});
-
-// =====================================================
-// DASHBOARD AKTUALISIEREN
-// =====================================================
-
-function updateDashboard(){
-
-  // Nur sichtbare Pflichtfelder
-  const visibleRequired =
-    [...required].filter(
-      el => el.offsetParent !== null
-    );
-
-  // Beantwortete Fragen
-  const answered =
-    visibleRequired.filter(
-      el => el.value !== ""
-    ).length;
-
-  // Gesamtanzahl
-  const total =
-    visibleRequired.length;
-
-  // Fehlende Antworten
-  const remaining =
-    total - answered;
-
-  // HTML aktualisieren
-  document
-    .getElementById("remaining")
-    .innerText = remaining;
-
-  // Prozentwert
-  const progress =
-    Math.round(
-      (answered / total) * 100
-    );
-
-  // Fortschrittsbalken
-  const progressBar =
-    document.getElementById(
-      "progressBar"
-    );
-
-  progressBar.style.width =
-    progress + "%";
-
-  progressBar.innerText =
-    progress + "%";
-
-  // Score berechnen
-  calculateScore();
-  const digital = calculateDigitalScore();
-  const ai = calculateAIScore();
-
-  console.log("Digital:", digital);
-  console.log("AI:", ai);
+  });
 }
 
-// =====================================================
-// REIFEGRADE BERECHNEN
-// =====================================================
+/* =====================================================
+   DASHBOARD AKTUALISIEREN
+   ===================================================== */
 
-function calculateScore(){
+function updateDashboard() {
+  updateProgress();
 
-  // Sichtbare Selectwerte sammeln
-  const values =
-    [...document.querySelectorAll("select")]
+  const overallPercent = calculateOverallScore();
+  const digitalPercent = calculateDigitalScore();
+  const aiPercent = calculateAiScore();
 
-      .filter(
-        el => el.offsetParent !== null
-      )
+  updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
+  updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
+  updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
 
-      .map(
-        el => Number(el.value)
-      )
-
-      .filter(
-        v => !isNaN(v)
-      );
-
-  // Keine Werte vorhanden
-  if(values.length === 0) return;
-
-  // Durchschnitt berechnen
-  const avg =
-    values.reduce(
-      (a,b)=>a+b,
-      0
-    ) / values.length;
-
-  // Score-Box
-  const scoreBox =
-    document.getElementById(
-      "scoreBox"
-    );
-
-  // Bewertung
-  if(avg < 2){
-
-    scoreBox.className =
-      "score-box red";
-
-    scoreBox.innerText =
-      "Reifegrad: Niedrig";
-
-  } else if(avg < 3.5){
-
-    scoreBox.className =
-      "score-box yellow";
-
-    scoreBox.innerText =
-      "Reifegrad: Mittel";
-
-  } else {
-
-    scoreBox.className =
-      "score-box green";
-
-    scoreBox.innerText =
-      "Reifegrad: Hoch";
-  }
-
-  // Diagramme aktualisieren
-  updateCharts();
+  updateCharts(overallPercent, digitalPercent, aiPercent);
 }
 
-/*function calculateDigitalScore(){
+/* =====================================================
+   FORTSCHRITT
+   ===================================================== */
 
-  const values =
+function updateProgress() {
+  const visibleRequired = [...required].filter(isVisible);
 
-    [...document.querySelectorAll(
-      ".digital-question select"
-    )]
-
-      .filter(
-        el => el.offsetParent !== null
-      )
-
-      .map(
-        el => Number(el.value)
-      )
-
-      .filter(
-        v => !isNaN(v)
-
-      );
-
-  /*let values = [];
-
-  digitalQuestions.forEach(select => {
-
-    if(select.value){
-
-      values.push(
-        Number(select.value)
-      );
+  const answered = visibleRequired.filter(field => {
+    if (field.type === "checkbox" || field.type === "radio") {
+      return field.checked;
     }
 
+    return field.value !== "";
+  }).length;
+
+  const total = visibleRequired.length;
+  const remaining = total - answered;
+
+  const progress = total === 0
+    ? 0
+    : Math.round((answered / total) * 100);
+
+  const remainingElement = document.getElementById("remaining");
+  const progressBar = document.getElementById("progressBar");
+
+  if (remainingElement) {
+    remainingElement.innerText = remaining;
+  }
+
+  if (progressBar) {
+    progressBar.style.width = progress + "%";
+    progressBar.innerText = progress + "%";
+  }
+}
+
+/* =====================================================
+   GESAMT-REIFEGRAD
+   Alle sichtbaren Skalenfragen
+   ===================================================== */
+
+function calculateOverallScore() {
+  const values = getVisibleSelectValues("select");
+
+  if (values.length === 0) return 0;
+
+  const avg = average(values);
+
+  return normalizeScore(avg);
+}
+
+/* =====================================================
+   DIGITALISIERUNGSGRAD
+   Nur Fragen mit .digital-question
+   ===================================================== */
+
+function calculateDigitalScore() {
+  const values = getVisibleSelectValues(".digital-question select");
+
+  if (values.length === 0) return 0;
+
+  const avg = average(values);
+
+  return normalizeScore(avg);
+}
+
+/* =====================================================
+   KI-REIFEGRAD
+   Nur Fragen mit .ai-question
+   ===================================================== */
+
+function calculateAiScore() {
+  const values = getVisibleSelectValues(".ai-question select");
+
+  if (values.length === 0) return 0;
+
+  const avg = average(values);
+
+  return normalizeScore(avg);
+}
+
+/* =====================================================
+   SICHTBARE SELECT-WERTE AUSLESEN
+   ===================================================== */
+
+function getVisibleSelectValues(selector) {
+  return [...document.querySelectorAll(selector)]
+    .filter(isVisible)
+    .map(select => Number(select.value))
+    .filter(value => !isNaN(value) && value >= 1 && value <= 4);
+}
+
+/* =====================================================
+   DURCHSCHNITT PRO FRAGENBLOCK
+   Für Radar: 0, A, B, C, D, E, F
+   ===================================================== */
+
+function getAverageBySection(section) {
+  const values = [...document.querySelectorAll(`[data-section="${section}"] select`)]
+    .filter(isVisible)
+    .map(select => Number(select.value))
+    .filter(value => !isNaN(value) && value >= 1 && value <= 4);
+
+  if (values.length === 0) return 0;
+
+  return average(values);
+}
+
+/* =====================================================
+   HILFSFUNKTIONEN
+   ===================================================== */
+
+function average(values) {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function normalizeScore(score) {
+  if (!score || score <= 0) return 0;
+
+  return Math.round(((score - 1) / 3) * 100);
+}
+
+function isVisible(element) {
+  return element.offsetParent !== null;
+}
+
+/* =====================================================
+   SCORE-BOXEN AKTUALISIEREN
+   ===================================================== */
+
+function updateScoreBox(elementId, percent, label) {
+  const box = document.getElementById(elementId);
+
+  if (!box) return;
+
+  box.classList.remove("red", "yellow", "green");
+
+  if (percent < 50) {
+    box.classList.add("red");
+  } else if (percent < 75) {
+    box.classList.add("yellow");
+  } else {
+    box.classList.add("green");
+  }
+
+  box.innerText = `${label}: ${percent} %`;
+}
+
+/* =====================================================
+   DIAGRAMME
+   Radar = 7-Eck nach Fragenblöcken
+   Balken = Gesamt, Digitalisierung, KI
+   ===================================================== */
+
+function updateCharts(overallPercent, digitalPercent, aiPercent) {
+  updateRadarChart();
+  updateBarChart(overallPercent, digitalPercent, aiPercent);
+}
+
+/* =====================================================
+   RADAR-CHART
+   ===================================================== */
+
+function updateRadarChart() {
+  const radarElement = document.getElementById("radarChart");
+
+  if (!radarElement || typeof Chart === "undefined") return;
+
+  const radarData = SECTIONS.map(section => {
+    return normalizeScore(getAverageBySection(section));
   });
 
-  if(values.length === 0){
-
-    return 0;
-  }
-
-  return values.reduce(
-    (a,b)=>a+b,
-    0
-  ) / values.length;
-
-// Score-Box
-  const scoreBox =
-    document.getElementById(
-      "digitalScoreBox"
-    );
-
-  // Bewertung
-  if(avg < 2){
-
-    scoreBox.className =
-      "score-box red";
-
-    scoreBox.innerText =
-      "Reifegrad: Niedrig";
-
-  } else if(avg < 3.5){
-
-    scoreBox.className =
-      "score-box yellow";
-
-    scoreBox.innerText =
-      "Reifegrad: Mittel";
-
-  } else {
-
-    scoreBox.className =
-      "score-box green";
-
-    scoreBox.innerText =
-      "Reifegrad: Hoch";
-  }
-
-  // Diagramme aktualisieren
-  updateCharts(avg);
-}*/
-
-function calculateDigitalScore(){
-
-    const questions =
-        document.querySelectorAll(
-            ".digital-question select"
-        );
-
-    let values = [];
-
-    questions.forEach(select => {
-
-        if(
-            select.offsetParent !== null &&
-            select.value !== ""
-        ){
-
-            values.push(
-                Number(select.value)
-            );
-
-        }
-
-    });
-
-    if(values.length === 0){
-
-        document.getElementById(
-            "digitalScoreBox"
-        ).innerText = "0 %";
-
-        return;
-    }
-
-    const avg =
-        values.reduce(
-            (a,b)=>a+b,
-            0
-        ) / values.length;
-
-    const percent =
-        Math.round(
-            ((avg - 1) / 3) * 100
-        );
-
-    document.getElementById(
-        "digitalScoreBox"
-    ).innerText =
-        percent + " %";
-
-  updateCharts();
-}
-
-/*function calculateAIScore(){
-
-  const values =
-
-    [...document.querySelectorAll(
-      ".ai-question select"
-    )]
-
-        .filter(
-        el => el.offsetParent !== null
-      )
-
-      .map(
-        el => Number(el.value)
-      )
-
-      .filter(
-        v => !isNaN(v)
-
-      );
-  /*let values = [];
-
-  aiQuestions.forEach(select => {
-
-    if(select.value){
-
-      values.push(
-        Number(select.value)
-      );
-    }
-
-  });
-
-  if(values.length === 0){
-
-    return 0;
-  }
-
-  return values.reduce(
-    (a,b)=>a+b,
-    0
-  ) / values.length;
-
-// Score-Box
-  const scoreBox =
-    document.getElementById(
-      "aiScoreBox"
-    );
-
-  // Bewertung
-  if(avg < 2){
-
-    scoreBox.className =
-      "score-box red";
-
-    scoreBox.innerText =
-      "Reifegrad: Niedrig";
-
-  } else if(avg < 3.5){
-
-    scoreBox.className =
-      "score-box yellow";
-
-    scoreBox.innerText =
-      "Reifegrad: Mittel";
-
-  } else {
-
-    scoreBox.className =
-      "score-box green";
-
-    scoreBox.innerText =
-      "Reifegrad: Hoch";
-  }
-
-  // Diagramme aktualisieren
-  updateCharts(avg);
-}*/
-
-function calculateAIScore(){
-
-    const questions =
-        document.querySelectorAll(
-            ".ai-question select"
-        );
-
-    let values = [];
-
-    questions.forEach(select => {
-
-        if(
-            select.offsetParent !== null &&
-            select.value !== ""
-        ){
-
-            values.push(
-                Number(select.value)
-            );
-
-        }
-
-    });
-
-    if(values.length === 0){
-
-        document.getElementById(
-            "aiScoreBox"
-        ).innerText = "0 %";
-
-        return;
-    }
-
-    const avg =
-        values.reduce(
-            (a,b)=>a+b,
-            0
-        ) / values.length;
-
-    const percent =
-        Math.round(
-            ((avg - 1) / 3) * 100
-        );
-
-    document.getElementById(
-        "aiScoreBox"
-    ).innerText =
-        percent + " %";
-
-  updateCharts();
-}
-
-// =====================================================
-// DIAGRAMME AKTUALISIEREN
-// =====================================================
-
-function updateCharts(){
-
-  // Bereichswerte berechnen
-const data = [
-
-  normalizeScore(
-    getAverageBySection("0")
-  ),
-
-  normalizeScore(
-    getAverageBySection("A")
-  ),
-
-  normalizeScore(
-    getAverageBySection("B")
-  ),
-
-  normalizeScore(
-    getAverageBySection("C")
-  ),
-
-  normalizeScore(
-    getAverageBySection("D")
-  ),
-
-  normalizeScore(
-    getAverageBySection("E")
-  ),
-
-  normalizeScore(
-    getAverageBySection("F")
-  )
-
-];
-
-  // Vorheriges Radar löschen
-  if(radarChart){
-
+  if (radarChart) {
     radarChart.destroy();
   }
 
-  // Radar Chart
-  radarChart = new Chart(
+  radarChart = new Chart(radarElement, {
+    type: "radar",
 
-    document.getElementById(
-      "radarChart"
-    ),
+    data: {
+      labels: SECTIONS.map(section => SECTION_LABELS[section]),
 
-    {
+      datasets: [{
+        label: "Reifegrad je Fragenblock (%)",
+        data: radarData
+      }]
+    },
 
-      type:"radar",
+    options: {
+      responsive: true,
 
-      data:{
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
 
-        labels:[
-
-            "Digitalisierungslogik",
-          
-            "Lieferanten",
-          
-            "Interne Systeme",
-          
-            "Kunden & Markt",
-          
-            "Wissensmanagement",
-          
-            "Rahmenbedingungen",
-          
-            "Strategie"
-          
-          ],
-
-        datasets:[{
-
-          label:"Digitalisierungsgrad",
-
-          data:data
-
-        }]
-      },
-
-          options:{
-
-            scales:{
-        
-              r:{
-        
-                min:0,
-        
-                max:100,
-        
-                ticks:{
-                  stepSize:20
-                }
-        
-              }
-        
-            }
-        
-          }
-
-      }
-  );
-
-  // Vorheriges Balkendiagramm löschen
-  if(barChart){
-
-    barChart.destroy();
-  }
-
-  // Balkendiagramm
-  barChart = new Chart(
-
-    document.getElementById(
-      "barChart"
-    ),
-
-    {
-
-      type:"bar",
-
-      data:{
-
-        labels:[
-          "Gesamt-Reifegrad"
-        ],
-
-        datasets:[{
-
-          label:"Score",
-
-          data:[avg]
-
-        }]
-      },
-
-      options:{
-
-        scales:{
-
-          y:{
-
-            min:0,
-
-            max:4
+          ticks: {
+            stepSize: 20
           }
         }
       }
     }
-  );
-}
-
-// =====================================================
-// DURCHSCHNITT PRO BEREICH
-// =====================================================
-
-/*function getAverageBySection(letter){
-
-  // Alle Labels sammeln
-  const labels =
-    [...document.querySelectorAll("label")];
-
-  // Zugehörige Fragen filtern
-  const related =
-    labels.filter(l =>
-      l.innerText.startsWith(letter)
-    );
-
-  let values = [];
-
-  related.forEach(label => {
-
-    const select =
-      label.parentElement
-        .querySelector("select");
-
-    if(select && select.value){
-
-      values.push(
-        Number(select.value)
-      );
-    }
-
   });
+}
 
-  // Keine Werte
-  if(values.length === 0){
+/* =====================================================
+   BALKENDIAGRAMM
+   ===================================================== */
 
-    return 0;
+function updateBarChart(overallPercent, digitalPercent, aiPercent) {
+  const barElement = document.getElementById("barChart");
+
+  if (!barElement || typeof Chart === "undefined") return;
+
+  if (barChart) {
+    barChart.destroy();
   }
 
-  // Durchschnitt
-  return values.reduce(
-    (a,b)=>a+b,
-    0
-  ) / values.length;
-}*/
+  barChart = new Chart(barElement, {
+    type: "bar",
 
-function getAverageBySection(letter){
+    data: {
+      labels: [
+        "Gesamt",
+        "Digitalisierung",
+        "KI"
+      ],
 
-  const questions =
+      datasets: [{
+        label: "Reifegrad (%)",
+        data: [
+          overallPercent,
+          digitalPercent,
+          aiPercent
+        ]
+      }]
+    },
 
-    document.querySelectorAll(
-      `[data-section="${letter}"]`
-    );
+    options: {
+      responsive: true,
 
-  let values = [];
+      scales: {
+        y: {
+          min: 0,
+          max: 100,
 
-  questions.forEach(question => {
-
-    const select =
-      question.querySelector("select");
-
-    if(
-      select &&
-      select.value
-    ){
-
-      values.push(
-        Number(select.value)
-      );
+          ticks: {
+            stepSize: 20
+          }
+        }
+      }
     }
-
   });
-
-  if(values.length === 0){
-
-    return 0;
-  }
-
-  return values.reduce(
-    (a,b)=>a+b,
-    0
-  ) / values.length;
-
 }
 
-// =====================================================
-// NORMIERUNG
-// 1-4 => 0-100%
-// =====================================================
+/* =====================================================
+   PDF EXPORT
+   ===================================================== */
 
-function normalizeScore(score){
-
-  if(score === 0){
-
-    return 0;
+async function downloadPDF() {
+  if (!window.jspdf) {
+    alert("PDF-Bibliothek jsPDF wurde nicht geladen.");
+    return;
   }
 
-  return ((score - 1) / 3) * 100;
-}
-
-// =====================================================
-// PDF EXPORT
-// =====================================================
-
-async function downloadPDF(){
-
-  // jsPDF laden
-  const { jsPDF } =
-    window.jspdf;
-
-  const doc =
-    new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
   let y = 20;
 
-  // Titel
   doc.setFontSize(18);
+  doc.text("DIGI-CO Quickcheck Ergebnisse", 20, y);
 
-  doc.text(
-    "DIGI-CO Quickcheck",
-    20,
-    y
-  );
+  y += 15;
 
-  y += 20;
+  doc.setFontSize(11);
+  doc.text(`Gesamt-Reifegrad: ${calculateOverallScore()} %`, 20, y);
+  y += 8;
+  doc.text(`Digitalisierungsgrad: ${calculateDigitalScore()} %`, 20, y);
+  y += 8;
+  doc.text(`KI-Reifegrad: ${calculateAiScore()} %`, 20, y);
+  y += 15;
 
-  // Alle Fragen durchlaufen
-  document
-    .querySelectorAll(".question")
-    .forEach(q => {
+  document.querySelectorAll(".question").forEach(question => {
+    if (!isVisible(question)) return;
 
-      // Versteckte Fragen ignorieren
-      if(q.offsetParent === null) return;
+    const label = question.querySelector("label")?.innerText || "";
+    const value = getQuestionValue(question);
 
-      const label =
-        q.querySelector("label")
-          ?.innerText || "";
+    const text = `${label}: ${value}`;
+    const lines = doc.splitTextToSize(text, 170);
 
-      const select =
-        q.querySelector("select");
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
 
-      const textarea =
-        q.querySelector("textarea");
+    doc.text(lines, 20, y);
+    y += lines.length * 7 + 5;
+  });
 
-      let value = "";
-
-      // Selectwert lesen
-      if(select){
-
-        value =
-          select.options[
-            select.selectedIndex
-          ].text;
-      }
-
-      // Textfeld lesen
-      if(textarea){
-
-        value = textarea.value;
-      }
-
-      // Text erzeugen
-      const text =
-        label + ": " + value;
-
-      // Zeilen umbrechen
-      const lines =
-        doc.splitTextToSize(
-          text,
-          170
-        );
-
-      // In PDF schreiben
-      doc.text(
-        lines,
-        20,
-        y
-      );
-
-      // Position erhöhen
-      y += lines.length * 8 + 5;
-
-      // Seitenumbruch
-      if(y > 270){
-
-        doc.addPage();
-
-        y = 20;
-      }
-
-    });
-
-  // Datei speichern
-  doc.save(
-    "DIGICO_Quickcheck.pdf"
-  );
+  doc.save("DIGICO_Quickcheck.pdf");
 }
 
-// =====================================================
-// CSV EXPORT
-// =====================================================
+/* =====================================================
+   CSV EXPORT
+   ===================================================== */
 
-function downloadCSV(){
+function downloadCSV() {
+  let csv = "Frage;Antwort\n";
 
-  // CSV Header
-  let csv =
-    "Frage;Antwort\n";
+  document.querySelectorAll(".question").forEach(question => {
+    if (!isVisible(question)) return;
 
-  // Fragen sammeln
-  document
-    .querySelectorAll(".question")
-    .forEach(q => {
+    const label = question.querySelector("label")?.innerText || "";
+    const value = getQuestionValue(question);
 
-      // Unsichtbare Fragen ignorieren
-      if(q.offsetParent === null) return;
+    csv += `"${escapeCSV(label)}";"${escapeCSV(value)}"\n`;
+  });
 
-      const label =
-        q.querySelector("label")
-          ?.innerText || "";
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
 
-      const select =
-        q.querySelector("select");
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-      const textarea =
-        q.querySelector("textarea");
+  link.href = url;
+  link.download = "DIGICO_Quickcheck.csv";
+  link.click();
 
-      let value = "";
-
-      // Selectwert lesen
-      if(select){
-
-        value =
-          select.options[
-            select.selectedIndex
-          ].text;
-      }
-
-      // Textfeld lesen
-      if(textarea){
-
-        value = textarea.value;
-      }
-
-      // CSV Zeile ergänzen
-      csv +=
-        `"${label}";"${value}"\n`;
-
-    });
-
-  // Datei erzeugen
-  const blob =
-    new Blob(
-      [csv],
-      { type: "text/csv" }
-    );
-
-  const url =
-    URL.createObjectURL(blob);
-
-  // Downloadlink erzeugen
-  const a =
-    document.createElement("a");
-
-  a.href = url;
-
-  a.download =
-    "DIGICO_Quickcheck.csv";
-
-  a.click();
-
-  // Speicher freigeben
   URL.revokeObjectURL(url);
 }
 
-// =====================================================
-// INITIALISIERUNG
-// =====================================================
+/* =====================================================
+   EXPORT-HILFSFUNKTIONEN
+   ===================================================== */
 
-// Dashboard initial laden
-updateDashboard();
+function getQuestionValue(question) {
+  const select = question.querySelector("select");
+  const textarea = question.querySelector("textarea");
+  const inputText = question.querySelector("input[type='text']");
+
+  if (select) {
+    return select.value
+      ? select.options[select.selectedIndex].text
+      : "";
+  }
+
+  if (textarea) {
+    return textarea.value;
+  }
+
+  if (inputText) {
+    return inputText.value;
+  }
+
+  const checkedBoxes = [...question.querySelectorAll("input[type='checkbox']:checked")]
+    .map(box => box.value);
+
+  if (checkedBoxes.length > 0) {
+    return checkedBoxes.join(", ");
+  }
+
+  return "";
+}
+
+function escapeCSV(value) {
+  return String(value).replaceAll('"', '""');
+}
+
