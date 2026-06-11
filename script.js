@@ -589,9 +589,34 @@ function downloadCSV() {
    ===================================================== */
 
 function getQuestionValue(question) {
-  const select = question.querySelector("select");
-  const textarea = question.querySelector("textarea");
+
+  // 1. Alle angehakten Checkboxen innerhalb der Frage sammeln
+  const checkedBoxes = [
+    ...question.querySelectorAll("input[type='checkbox']:checked")
+  ].map(box => box.value);
+
+  // 2. Sonstiges-Feld auslesen, falls vorhanden
   const inputText = question.querySelector("input[type='text']");
+
+  const otherValue =
+    inputText && inputText.value.trim() !== ""
+      ? "Sonstiges: " + inputText.value.trim()
+      : "";
+
+  // 3. Wenn Checkboxen oder Sonstiges vorhanden sind, gemeinsam zurückgeben
+  if (checkedBoxes.length > 0 || otherValue !== "") {
+
+    const values = [...checkedBoxes];
+
+    if (otherValue !== "") {
+      values.push(otherValue);
+    }
+
+    return values.join(", ");
+  }
+
+  // 4. Normale Select-Fragen auslesen
+  const select = question.querySelector("select");
 
   if (select) {
     return select.value
@@ -599,25 +624,17 @@ function getQuestionValue(question) {
       : "";
   }
 
+  // 5. Offene Textantworten auslesen
+  const textarea = question.querySelector("textarea");
+
   if (textarea) {
     return textarea.value;
   }
 
+  // 6. Normale Textfelder auslesen
   if (inputText) {
     return inputText.value;
   }
 
-  const checkedBoxes = [...question.querySelectorAll("input[type='checkbox']:checked")]
-    .map(box => box.value);
-
-  if (checkedBoxes.length > 0) {
-    return checkedBoxes.join(", ");
-  }
-
   return "";
 }
-
-function escapeCSV(value) {
-  return String(value).replaceAll('"', '""');
-}
-
