@@ -81,37 +81,49 @@ function updateQuestionColor(select) {
 function initAiLogic() {
   document.querySelectorAll(".trigger-ai").forEach(trigger => {
     trigger.addEventListener("change", () => {
-      const targetId = trigger.dataset.target;
-      const target = document.getElementById(targetId);
-
-      if (!target) {
-        console.warn("KI-Zielcontainer nicht gefunden:", targetId);
-        return;
-      }
-
-      const score = Number(trigger.value);
-
-      if (score >= 3) {
-        target.classList.remove("hidden");
-      } else {
-        target.classList.add("hidden");
-
-        target.querySelectorAll("select, textarea, input").forEach(field => {
-          if (field.type === "checkbox" || field.type === "radio") {
-            field.checked = false;
-          } else {
-            field.value = "";
-          }
-
-          const question = field.closest(".question");
-          if (question) {
-            question.classList.remove("good", "medium", "bad");
-          }
-        });
-      }
-
+      updateAiVisibility();
       updateDashboard();
     });
+  });
+}
+
+function updateAiVisibility() {
+  SECTIONS.forEach(section => {
+    const aiContainer = document.getElementById(
+      section === "0" ? "zero-ai" : section.toLowerCase() + "-ai"
+    );
+
+    if (!aiContainer) return;
+
+    const digitalQuestions = [
+      ...document.querySelectorAll(
+        `.digital-question[data-section="${section}"] select`
+      )
+    ].filter(isVisible);
+
+    const allAnsweredGood =
+      digitalQuestions.length > 0 &&
+      digitalQuestions.every(select => Number(select.value) >= 3);
+
+    if (allAnsweredGood) {
+      aiContainer.classList.remove("hidden");
+    } else {
+      aiContainer.classList.add("hidden");
+
+      aiContainer.querySelectorAll("select, textarea, input").forEach(field => {
+        if (field.type === "checkbox" || field.type === "radio") {
+          field.checked = false;
+        } else {
+          field.value = "";
+        }
+
+        const question = field.closest(".question");
+
+        if (question) {
+          question.classList.remove("good", "medium", "bad");
+        }
+      });
+    }
   });
 }
 
@@ -121,6 +133,22 @@ function initAiLogic() {
 
 function updateDashboard() {
   updateProgress();
+  updateAiVisibility();
+
+  const visibleRequired = [...required].filter(isVisible);
+
+  const allVisibleAnswered = visibleRequired.every(field => {
+    if (field.type === "checkbox" || field.type === "radio") {
+      return field.checked;
+    }
+
+    return field.value !== "";
+  });
+
+  if (!allVisibleAnswered) {
+    hideResultsUntilComplete();
+    return;
+  }
 
   const overallPercent = calculateOverallScore();
   const digitalPercent = calculateDigitalScore();
@@ -133,6 +161,36 @@ function updateDashboard() {
   updateCharts(overallPercent, digitalPercent, aiPercent);
 }
 
+/* =====================================================
+   ERGEBNISSE ERST ANZEIGEN WENN ALLE SICHTBAREN FRAGEN BEANTWORTET SIND
+   ===================================================== */
+
+function hideResultsUntilComplete() {
+  const scoreBoxes = [
+    "scoreBox",
+    "digitalScoreBox",
+    "aiScoreBox"
+  ];
+
+  scoreBoxes.forEach(id => {
+    const box = document.getElementById(id);
+
+    if (!box) return;
+
+    box.classList.remove("red", "yellow", "green");
+    box.innerText = "Auswertung nach vollständiger Beantwortung";
+  });
+
+  if (radarChart) {
+    radarChart.destroy();
+    radarChart = null;
+  }
+
+  if (barChart) {
+    barChart.destroy();
+    barChart = null;
+  }
+}
 /* =====================================================
    FORTSCHRITT
    ===================================================== */
