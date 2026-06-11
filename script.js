@@ -39,16 +39,30 @@ document.addEventListener("DOMContentLoaded", () => {
    ===================================================== */
 
 function initAnswerListeners() {
-  document.querySelectorAll("select, textarea, input").forEach(element => {
-    element.addEventListener("change", updateDashboard);
-    element.addEventListener("input", updateDashboard);
-  });
 
-  document.querySelectorAll("select").forEach(select => {
-    select.addEventListener("change", () => {
-      updateQuestionColor(select);
+  document
+    .querySelectorAll("select, textarea, input")
+    .forEach(element => {
+
+      element.addEventListener("change", () => {
+
+        if (element.tagName === "SELECT") {
+          updateQuestionColor(element);
+        }
+
+        updateAiVisibility();
+        updateDashboard();
+
+      });
+
+      element.addEventListener("input", () => {
+
+        updateAiVisibility();
+        updateDashboard();
+
+      });
+
     });
-  });
 }
 
 /* =====================================================
@@ -79,19 +93,18 @@ function updateQuestionColor(select) {
    ===================================================== */
 
 function initAiLogic() {
-  document.querySelectorAll(".trigger-ai").forEach(trigger => {
-    trigger.addEventListener("change", () => {
       updateAiVisibility();
       updateDashboard();
-    });
-  });
 }
 
 function updateAiVisibility() {
-  SECTIONS.forEach(section => {
-    const aiContainer = document.getElementById(
-      section === "0" ? "zero-ai" : section.toLowerCase() + "-ai"
-    );
+
+  const sectionsWithAi = ["A", "B", "C", "D"];
+
+  sectionsWithAi.forEach(section => {
+
+    const aiContainer =
+      document.getElementById(section.toLowerCase() + "-ai");
 
     if (!aiContainer) return;
 
@@ -101,64 +114,105 @@ function updateAiVisibility() {
       )
     ].filter(isVisible);
 
-    const allAnsweredGood =
+    const allDigitalQuestionsGood =
       digitalQuestions.length > 0 &&
-      digitalQuestions.every(select => Number(select.value) >= 3);
+      digitalQuestions.every(select => {
 
-    if (allAnsweredGood) {
+        const value = Number(select.value);
+
+        return value === 3 || value === 4;
+
+      });
+
+    if (allDigitalQuestionsGood) {
+
       aiContainer.classList.remove("hidden");
+
     } else {
+
       aiContainer.classList.add("hidden");
 
-      aiContainer.querySelectorAll("select, textarea, input").forEach(field => {
-        if (field.type === "checkbox" || field.type === "radio") {
-          field.checked = false;
-        } else {
-          field.value = "";
-        }
+      aiContainer
+        .querySelectorAll("select, textarea, input")
+        .forEach(field => {
 
-        const question = field.closest(".question");
+          if (field.type === "checkbox" || field.type === "radio") {
+            field.checked = false;
+          } else {
+            field.value = "";
+          }
 
-        if (question) {
-          question.classList.remove("good", "medium", "bad");
-        }
-      });
+          const question = field.closest(".question");
+
+          if (question) {
+            question.classList.remove("good", "medium", "bad");
+          }
+
+        });
+
     }
-  });
-}
 
+  });
+
+}
 /* =====================================================
    DASHBOARD AKTUALISIEREN
    ===================================================== */
 
 function updateDashboard() {
+
   updateProgress();
-  updateAiVisibility();
 
   const visibleRequired = [...required].filter(isVisible);
 
-  const allVisibleAnswered = visibleRequired.every(field => {
-    if (field.type === "checkbox" || field.type === "radio") {
-      return field.checked;
-    }
+  const allVisibleAnswered =
+    visibleRequired.length > 0 &&
+    visibleRequired.every(field => {
 
-    return field.value !== "";
-  });
+      if (field.type === "checkbox" || field.type === "radio") {
+        return field.checked;
+      }
+
+      return field.value !== "";
+
+    });
 
   if (!allVisibleAnswered) {
+
     hideResultsUntilComplete();
+
     return;
+
   }
 
   const overallPercent = calculateOverallScore();
   const digitalPercent = calculateDigitalScore();
   const aiPercent = calculateAiScore();
 
-  updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
-  updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
-  updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
+  updateScoreBox(
+    "scoreBox",
+    overallPercent,
+    "Gesamt-Reifegrad"
+  );
 
-  updateCharts(overallPercent, digitalPercent, aiPercent);
+  updateScoreBox(
+    "digitalScoreBox",
+    digitalPercent,
+    "Digitalisierungsgrad"
+  );
+
+  updateScoreBox(
+    "aiScoreBox",
+    aiPercent,
+    "KI-Reifegrad"
+  );
+
+  updateCharts(
+    overallPercent,
+    digitalPercent,
+    aiPercent
+  );
+
 }
 
 /* =====================================================
@@ -166,6 +220,7 @@ function updateDashboard() {
    ===================================================== */
 
 function hideResultsUntilComplete() {
+
   const scoreBoxes = [
     "scoreBox",
     "digitalScoreBox",
@@ -173,12 +228,16 @@ function hideResultsUntilComplete() {
   ];
 
   scoreBoxes.forEach(id => {
+
     const box = document.getElementById(id);
 
     if (!box) return;
 
     box.classList.remove("red", "yellow", "green");
-    box.innerText = "Auswertung nach vollständiger Beantwortung";
+
+    box.innerText =
+      "Auswertung nach vollständiger Beantwortung";
+
   });
 
   if (radarChart) {
@@ -190,6 +249,7 @@ function hideResultsUntilComplete() {
     barChart.destroy();
     barChart = null;
   }
+
 }
 /* =====================================================
    FORTSCHRITT
