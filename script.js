@@ -162,8 +162,11 @@ function updateDashboard(){
 
   // Score berechnen
   calculateScore();
-  calculateDigitalScore();
-  calculateAIScore();
+  const digital = calculateDigitalScore();
+  const ai = calculateAIScore();
+
+  console.log("Digital:", digital);
+  console.log("AI:", ai);
 }
 
 // =====================================================
@@ -231,10 +234,10 @@ function calculateScore(){
   }
 
   // Diagramme aktualisieren
-  updateCharts(avg);
+  updateCharts();
 }
 
-function calculateDigitalScore(){
+/*function calculateDigitalScore(){
 
   const values =
 
@@ -266,7 +269,7 @@ function calculateDigitalScore(){
       );
     }
 
-  });*/
+  });
 
   if(values.length === 0){
 
@@ -312,9 +315,61 @@ function calculateDigitalScore(){
 
   // Diagramme aktualisieren
   updateCharts(avg);
+}*/
+
+function calculateDigitalScore(){
+
+    const questions =
+        document.querySelectorAll(
+            ".digital-question select"
+        );
+
+    let values = [];
+
+    questions.forEach(select => {
+
+        if(
+            select.offsetParent !== null &&
+            select.value !== ""
+        ){
+
+            values.push(
+                Number(select.value)
+            );
+
+        }
+
+    });
+
+    if(values.length === 0){
+
+        document.getElementById(
+            "digitalScoreBox"
+        ).innerText = "0 %";
+
+        return;
+    }
+
+    const avg =
+        values.reduce(
+            (a,b)=>a+b,
+            0
+        ) / values.length;
+
+    const percent =
+        Math.round(
+            ((avg - 1) / 3) * 100
+        );
+
+    document.getElementById(
+        "digitalScoreBox"
+    ).innerText =
+        percent + " %";
+
+  updateCharts();
 }
 
-function calculateAIScore(){
+/*function calculateAIScore(){
 
   const values =
 
@@ -345,7 +400,7 @@ function calculateAIScore(){
       );
     }
 
-  });*/
+  });
 
   if(values.length === 0){
 
@@ -391,13 +446,65 @@ function calculateAIScore(){
 
   // Diagramme aktualisieren
   updateCharts(avg);
+}*/
+
+function calculateAIScore(){
+
+    const questions =
+        document.querySelectorAll(
+            ".ai-question select"
+        );
+
+    let values = [];
+
+    questions.forEach(select => {
+
+        if(
+            select.offsetParent !== null &&
+            select.value !== ""
+        ){
+
+            values.push(
+                Number(select.value)
+            );
+
+        }
+
+    });
+
+    if(values.length === 0){
+
+        document.getElementById(
+            "aiScoreBox"
+        ).innerText = "0 %";
+
+        return;
+    }
+
+    const avg =
+        values.reduce(
+            (a,b)=>a+b,
+            0
+        ) / values.length;
+
+    const percent =
+        Math.round(
+            ((avg - 1) / 3) * 100
+        );
+
+    document.getElementById(
+        "aiScoreBox"
+    ).innerText =
+        percent + " %";
+
+  updateCharts();
 }
 
 // =====================================================
 // DIAGRAMME AKTUALISIEREN
 // =====================================================
 
-function updateCharts(avg){
+function updateCharts(){
 
   // Bereichswerte berechnen
 const data = [
