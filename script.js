@@ -325,24 +325,29 @@ function calculateDigitalScore() {
 
 function calculateAiScore() {
 
-  const aiQuestions = [
+  const allAiQuestions = [
     ...document.querySelectorAll(".ai-question select")
-  ].filter(isVisible);
+  ];
 
-  if (aiQuestions.length === 0) {
+  if (allAiQuestions.length === 0) {
     return null;
   }
 
   let achievedPoints = 0;
-  let maxPoints = aiQuestions.length * 4;
 
-  aiQuestions.forEach(select => {
+  allAiQuestions.forEach(select => {
 
-    if (select.value !== "") {
+    if (
+      isVisible(select) &&
+      select.value !== ""
+    ) {
       achievedPoints += Number(select.value);
     }
 
   });
+
+  const maxPoints =
+    allAiQuestions.length * 4;
 
   const percent =
     Math.round(
