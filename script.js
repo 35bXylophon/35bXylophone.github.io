@@ -175,32 +175,50 @@ function updateDashboard() {
       return field.value !== "";
     });
 
-  updateAiScoreVisibility();
+  const aiIsAvailable =
+    hasAnsweredAiQuestions() && allVisibleAnswered;
+
+  updateAiScoreVisibility(aiIsAvailable);
 
   if (!allVisibleAnswered) {
     hideResultsUntilComplete();
-    updateAiScoreVisibility();
+    updateAiScoreVisibility(false);
     return;
   }
 
   const overallPercent = calculateOverallScore();
   const digitalPercent = calculateDigitalScore();
 
-  const aiIsAvailable = hasAnsweredAiQuestions();
-  const aiPercent = aiIsAvailable ? calculateAiScore() : null;
+  const aiPercent = aiIsAvailable
+    ? calculateAiScore()
+    : null;
 
-  updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
-  updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
+  updateScoreBox(
+    "scoreBox",
+    overallPercent,
+    "Gesamt-Reifegrad"
+  );
+
+  updateScoreBox(
+    "digitalScoreBox",
+    digitalPercent,
+    "Digitalisierungsgrad"
+  );
 
   if (aiIsAvailable) {
-    updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
+    updateScoreBox(
+      "aiScoreBox",
+      aiPercent,
+      "KI-Reifegrad"
+    );
   }
 
-  updateAiScoreVisibility();
-
-  updateCharts(overallPercent, digitalPercent, aiPercent);
+  updateCharts(
+    overallPercent,
+    digitalPercent,
+    aiPercent
+  );
 }
-
 /* =====================================================
    ERGEBNISSE ERST ANZEIGEN WENN ALLE SICHTBAREN FRAGEN BEANTWORTET SIND
    ===================================================== */
@@ -227,7 +245,7 @@ function hideResultsUntilComplete() {
     aiBox.innerText = "KI-Reifegrad: 0 %";
   }
 
-  updateAiScoreVisibility();
+  updateAiScoreVisibility(false);
 
   if (radarChart) {
     radarChart.destroy();
@@ -338,21 +356,26 @@ function calculateAiScore() {
   return percent;
 }
 
+/* =====================================================
+   KI-FRAGEN ÜBERPRÜFEN
+   ===================================================== */
+
 function hasAnsweredAiQuestions() {
   return [...document.querySelectorAll(".ai-question select")]
     .filter(isVisible)
     .some(select => select.value !== "");
 }
 
-function updateAiScoreVisibility() {
+/* =====================================================
+   KI-REIFEGRAD UN-/SICHTBAR MACHEN
+   ===================================================== */
+
+function updateAiScoreVisibility(show) {
   const aiScoreCard = document.getElementById("aiScoreCard");
 
-  if (!aiScoreCard) {
-    console.warn("aiScoreCard wurde im HTML nicht gefunden.");
-    return;
-  }
+  if (!aiScoreCard) return;
 
-  if (hasAnsweredAiQuestions()) {
+  if (show) {
     aiScoreCard.classList.remove("hidden");
   } else {
     aiScoreCard.classList.add("hidden");
