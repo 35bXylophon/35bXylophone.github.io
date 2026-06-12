@@ -186,33 +186,34 @@ function updateDashboard() {
   }
 
   const overallPercent = calculateOverallScore();
-  const digitalPercent = calculateDigitalScore();
-  const aiPercent = calculateAiScore();
+const digitalPercent = calculateDigitalScore();
 
-  updateScoreBox(
-    "scoreBox",
-    overallPercent,
-    "Gesamt-Reifegrad"
-  );
+const aiScoreCard = document.getElementById("aiScoreCard");
 
-  updateScoreBox(
-    "digitalScoreBox",
-    digitalPercent,
-    "Digitalisierungsgrad"
-  );
+let aiPercent = 0;
 
-  updateScoreBox(
-    "aiScoreBox",
-    aiPercent,
-    "KI-Reifegrad"
-  );
+if (hasAnsweredAiQuestions()) {
 
-  updateCharts(
-    overallPercent,
-    digitalPercent,
-    aiPercent
-  );
+  aiPercent = calculateAiScore();
 
+  if (aiScoreCard) {
+    aiScoreCard.classList.remove("hidden");
+  }
+
+  updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
+
+} else {
+
+  if (aiScoreCard) {
+    aiScoreCard.classList.add("hidden");
+  }
+
+}
+
+updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
+updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
+
+updateCharts(overallPercent, digitalPercent, aiPercent);
 }
 
 /* =====================================================
@@ -329,6 +330,18 @@ function calculateAiScore() {
   const avg = average(values);
 
   return normalizeScore(avg);
+}
+
+function hasAnsweredAiQuestions() {
+
+  const aiValues = [
+    ...document.querySelectorAll(".ai-question select")
+  ]
+    .filter(isVisible)
+    .map(select => select.value)
+    .filter(value => value !== "");
+
+  return aiValues.length > 0;
 }
 
 /* =====================================================
@@ -468,23 +481,30 @@ function updateBarChart(overallPercent, digitalPercent, aiPercent) {
     barChart.destroy();
   }
 
+  const labels = [
+    "Gesamt",
+    "Digitalisierung"
+  ];
+
+  const values = [
+    overallPercent,
+    digitalPercent
+  ];
+
+  if (hasAnsweredAiQuestions()) {
+    labels.push("KI");
+    values.push(aiPercent);
+  }
+
   barChart = new Chart(barElement, {
     type: "bar",
 
     data: {
-      labels: [
-        "Gesamt",
-        "Digitalisierung",
-        "KI"
-      ],
+      labels: labels,
 
       datasets: [{
         label: "Reifegrad (%)",
-        data: [
-          overallPercent,
-          digitalPercent,
-          aiPercent
-        ]
+        data: values
       }]
     },
 
@@ -504,7 +524,6 @@ function updateBarChart(overallPercent, digitalPercent, aiPercent) {
     }
   });
 }
-
 /* =====================================================
    PDF EXPORT
    ===================================================== */
