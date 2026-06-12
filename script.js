@@ -310,13 +310,32 @@ function calculateDigitalScore() {
    ===================================================== */
 
 function calculateAiScore() {
-  const values = getVisibleSelectValues(".ai-question select");
 
-  if (values.length === 0) return 0;
+  const aiQuestions = [
+    ...document.querySelectorAll(".ai-question select")
+  ].filter(isVisible);
 
-  const avg = average(values);
+  if (aiQuestions.length === 0) {
+    return null;
+  }
 
-  return normalizeScore(avg);
+  let achievedPoints = 0;
+  let maxPoints = aiQuestions.length * 4;
+
+  aiQuestions.forEach(select => {
+
+    if (select.value !== "") {
+      achievedPoints += Number(select.value);
+    }
+
+  });
+
+  const percent =
+    Math.round(
+      (achievedPoints / maxPoints) * 100
+    );
+
+  return percent;
 }
 
 function hasAnsweredAiQuestions() {
@@ -652,4 +671,67 @@ function getQuestionValue(question) {
   }
 
   return "";
+}
+
+function resetQuestionnaire() {
+
+  const confirmReset = confirm(
+    "Möchten Sie wirklich alle Antworten zurücksetzen?"
+  );
+
+  if (!confirmReset) return;
+
+  // Alle Select-Felder zurücksetzen
+  document.querySelectorAll("select").forEach(select => {
+    select.value = "";
+  });
+
+  // Alle Textfelder und Textareas zurücksetzen
+  document.querySelectorAll("textarea, input[type='text']").forEach(field => {
+    field.value = "";
+  });
+
+  // Alle Checkboxen und Radio-Buttons zurücksetzen
+  document
+    .querySelectorAll("input[type='checkbox'], input[type='radio']")
+    .forEach(field => {
+      field.checked = false;
+    });
+
+  // Alle Frage-Ampelfarben entfernen
+  document.querySelectorAll(".question").forEach(question => {
+    question.classList.remove("good", "medium", "bad");
+  });
+
+  // Alle KI-Fragen wieder ausblenden
+  document.querySelectorAll("#a-ai, #b-ai, #c-ai, #d-ai").forEach(container => {
+    container.classList.add("hidden");
+  });
+
+  // KI-Reifegrad-Card ausblenden, falls vorhanden
+  const aiScoreCard = document.getElementById("aiScoreCard");
+
+  if (aiScoreCard) {
+    aiScoreCard.classList.add("hidden");
+  }
+
+  // Diagramme löschen
+  if (radarChart) {
+    radarChart.destroy();
+    radarChart = null;
+  }
+
+  if (barChart) {
+    barChart.destroy();
+    barChart = null;
+  }
+
+  // Dashboard zurücksetzen
+  updateDashboard();
+
+  // Wieder nach oben scrollen
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
