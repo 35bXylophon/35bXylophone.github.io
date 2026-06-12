@@ -175,10 +175,11 @@ function updateDashboard() {
       return field.value !== "";
     });
 
-  const aiIsAvailable =
-    hasAnsweredAiQuestions() && allVisibleAnswered;
+  const aiReady =
+    allVisibleAnswered &&
+    allVisibleAiQuestionsAnswered();
 
-  updateAiScoreVisibility(aiIsAvailable);
+  updateAiScoreVisibility(aiReady);
 
   if (!allVisibleAnswered) {
     hideResultsUntilComplete();
@@ -189,7 +190,7 @@ function updateDashboard() {
   const overallPercent = calculateOverallScore();
   const digitalPercent = calculateDigitalScore();
 
-  const aiPercent = aiIsAvailable
+  const aiPercent = aiReady
     ? calculateAiScore()
     : null;
 
@@ -205,7 +206,7 @@ function updateDashboard() {
     "Digitalisierungsgrad"
   );
 
-  if (aiIsAvailable) {
+  if (aiReady) {
     updateScoreBox(
       "aiScoreBox",
       aiPercent,
@@ -219,6 +220,7 @@ function updateDashboard() {
     aiPercent
   );
 }
+
 /* =====================================================
    ERGEBNISSE ERST ANZEIGEN WENN ALLE SICHTBAREN FRAGEN BEANTWORTET SIND
    ===================================================== */
@@ -238,13 +240,6 @@ function hideResultsUntilComplete() {
     box.innerText = "Auswertung nach vollständiger Beantwortung";
   });
 
-  const aiBox = document.getElementById("aiScoreBox");
-
-  if (aiBox) {
-    aiBox.classList.remove("red", "yellow", "green");
-    aiBox.innerText = "KI-Reifegrad: 0 %";
-  }
-
   updateAiScoreVisibility(false);
 
   if (radarChart) {
@@ -257,6 +252,7 @@ function hideResultsUntilComplete() {
     barChart = null;
   }
 }
+
 /* =====================================================
    FORTSCHRITT
    ===================================================== */
@@ -375,11 +371,27 @@ function updateAiScoreVisibility(show) {
 
   if (!aiScoreCard) return;
 
-  if (show) {
+  if (show === true) {
     aiScoreCard.classList.remove("hidden");
   } else {
     aiScoreCard.classList.add("hidden");
   }
+}
+
+/* =====================================================
+   CHECK FÜR SICHTBARE KI-FRAGEN
+   ===================================================== */
+
+function allVisibleAiQuestionsAnswered() {
+  const visibleAiQuestions = [
+    ...document.querySelectorAll(".ai-question select")
+  ].filter(isVisible);
+
+  if (visibleAiQuestions.length === 0) {
+    return false;
+  }
+
+  return visibleAiQuestions.every(select => select.value !== "");
 }
 
 /* =====================================================
