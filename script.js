@@ -347,7 +347,8 @@ function calculateAiScore() {
   });
 
   const maxPoints =
-    allAiQuestions.length * 4;
+    /*allAiQuestions.length * 4;*/
+     9 * 4;
 
   const percent =
     Math.round(
