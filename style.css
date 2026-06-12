@@ -111,16 +111,13 @@ header{
 /* ===================================================== */
 
 .card{
-
-  background:var(--card-bg);
-
+  background:white;
   padding:25px;
-
   border-radius:14px;
-
-  box-shadow:var(--shadow);
-
-  margin-bottom:25px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  margin:0 auto 25px auto;
+  max-width:1200px;
+  box-sizing:border-box;
 }
 
 /* ===================================================== */
@@ -128,18 +125,12 @@ header{
 /* ===================================================== */
 
 .question{
-
   margin-bottom:20px;
-
   padding:15px;
-
   border-left:5px solid var(--primary);
-
   background:#fafafa;
-
   border-radius:10px;
-
-  transition:0.3s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* Gute Bewertung */
