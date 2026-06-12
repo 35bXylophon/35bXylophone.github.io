@@ -160,60 +160,45 @@ function updateAiVisibility() {
    ===================================================== */
 
 function updateDashboard() {
-
   updateProgress();
+  updateAiVisibility();
 
   const visibleRequired = [...required].filter(isVisible);
 
   const allVisibleAnswered =
     visibleRequired.length > 0 &&
     visibleRequired.every(field => {
-
       if (field.type === "checkbox" || field.type === "radio") {
         return field.checked;
       }
 
       return field.value !== "";
-
     });
 
+  updateAiScoreVisibility();
+
   if (!allVisibleAnswered) {
-
     hideResultsUntilComplete();
-
+    updateAiScoreVisibility();
     return;
-
   }
 
   const overallPercent = calculateOverallScore();
-const digitalPercent = calculateDigitalScore();
+  const digitalPercent = calculateDigitalScore();
 
-const aiScoreCard = document.getElementById("aiScoreCard");
+  const aiIsAvailable = hasAnsweredAiQuestions();
+  const aiPercent = aiIsAvailable ? calculateAiScore() : null;
 
-let aiPercent = 0;
+  updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
+  updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
 
-if (hasAnsweredAiQuestions()) {
-
-  aiPercent = calculateAiScore();
-
-  if (aiScoreCard) {
-    aiScoreCard.classList.remove("hidden");
+  if (aiIsAvailable) {
+    updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
   }
 
-  updateScoreBox("aiScoreBox", aiPercent, "KI-Reifegrad");
+  updateAiScoreVisibility();
 
-} else {
-
-  if (aiScoreCard) {
-    aiScoreCard.classList.add("hidden");
-  }
-
-}
-
-updateScoreBox("scoreBox", overallPercent, "Gesamt-Reifegrad");
-updateScoreBox("digitalScoreBox", digitalPercent, "Digitalisierungsgrad");
-
-updateCharts(overallPercent, digitalPercent, aiPercent);
+  updateCharts(overallPercent, digitalPercent, aiPercent);
 }
 
 /* =====================================================
@@ -221,25 +206,28 @@ updateCharts(overallPercent, digitalPercent, aiPercent);
    ===================================================== */
 
 function hideResultsUntilComplete() {
-
   const scoreBoxes = [
     "scoreBox",
-    "digitalScoreBox",
-    "aiScoreBox"
+    "digitalScoreBox"
   ];
 
   scoreBoxes.forEach(id => {
-
     const box = document.getElementById(id);
 
     if (!box) return;
 
     box.classList.remove("red", "yellow", "green");
-
-    box.innerText =
-      "Auswertung nach vollständiger Beantwortung";
-
+    box.innerText = "Auswertung nach vollständiger Beantwortung";
   });
+
+  const aiBox = document.getElementById("aiScoreBox");
+
+  if (aiBox) {
+    aiBox.classList.remove("red", "yellow", "green");
+    aiBox.innerText = "KI-Reifegrad: 0 %";
+  }
+
+  updateAiScoreVisibility();
 
   if (radarChart) {
     radarChart.destroy();
@@ -250,7 +238,6 @@ function hideResultsUntilComplete() {
     barChart.destroy();
     barChart = null;
   }
-
 }
 /* =====================================================
    FORTSCHRITT
@@ -333,15 +320,24 @@ function calculateAiScore() {
 }
 
 function hasAnsweredAiQuestions() {
-
-  const aiValues = [
-    ...document.querySelectorAll(".ai-question select")
-  ]
+  return [...document.querySelectorAll(".ai-question select")]
     .filter(isVisible)
-    .map(select => select.value)
-    .filter(value => value !== "");
+    .some(select => select.value !== "");
+}
 
-  return aiValues.length > 0;
+function updateAiScoreVisibility() {
+  const aiScoreCard = document.getElementById("aiScoreCard");
+
+  if (!aiScoreCard) {
+    console.warn("aiScoreCard wurde im HTML nicht gefunden.");
+    return;
+  }
+
+  if (hasAnsweredAiQuestions()) {
+    aiScoreCard.classList.remove("hidden");
+  } else {
+    aiScoreCard.classList.add("hidden");
+  }
 }
 
 /* =====================================================
@@ -491,7 +487,7 @@ function updateBarChart(overallPercent, digitalPercent, aiPercent) {
     digitalPercent
   ];
 
-  if (hasAnsweredAiQuestions()) {
+  if (aiPercent !== null) {
     labels.push("KI");
     values.push(aiPercent);
   }
