@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "title": "DIGI-CO Quickcheck",
+    "subtitle": "Fragebogen zur Messung des Digitalisierungs-Reifegrades",
+    "logoText": "Logo",
+    "partnerText": "Geldgeber/Partner",
+    "pdfFileName": "DIGICO_Quickcheck.pdf",
+    "csvFileName": "DIGICO_Quickcheck.csv"
+  },
+  "scoring": {
+    "scaleMin": 1,
+    "scaleMax": 4,
+    "aiUnlockThreshold": 3,
+    "redBelow": 50,
+    "yellowBelow": 75,
+    "showResultsOnlyWhenComplete": true,
+    "aiScoreBasedOnAllAiQuestions": true
+  },
+  "sections": [
+    {
+      "id": "0",
+      "title": "0. Allgemeine Digitalisierungslogik",
+      "radarLabel": "Digitalisierungslogik",
+      "hasAiQuestions": false,
+      "questions": [
+        {"id":"0.1","text":"Vor dem Start von Digitalisierungsmaßnahmen sind Ziel und erwarteter Nutzen schriftlich festgehalten.","type":"scale","category":"digital","required":true},
+        {"id":"0.2","text":"Nach Abschluss von Digitalisierungsmaßnahmen prüfen wir systematisch, ob der erwartete Nutzen tatsächlich erreicht wurde.","type":"scale","category":"digital","required":true},
+        {"id":"0.3","text":"Wir starten gelegentlich Digitalisierungsmaßnahmen, obwohl der Nutzen noch nicht klar quantifiziert ist.","type":"scale","category":"digital","required":true,"invertScore":true},
+        {"id":"0.4","text":"Hauptauslöser für Digitalisierungsprojekte (max. 2 auswählen)","type":"checkbox","category":"info","required":false,"maxChoices":2,"options":["Kostendruck / Produktivität","Kundenanforderung","Lieferantenanforderung","Qualitäts- / Fehlerprobleme","Compliance / Regulierung","Wettbewerbsdruck","Förderprogramme"],"allowOther":true}
+      ]
+    },
+    {
+      "id":"A",
+      "title":"A. Lieferanten & Partner",
+      "radarLabel":"Lieferanten",
+      "hasAiQuestions":true,
+      "questions":[
+        {"id":"A1","text":"Bestellungen oder Liefervorankündigungen von Lieferanten werden digital empfangen und automatisch verarbeitet.","type":"scale","category":"digital","required":true},
+        {"id":"A2","text":"Artikel- und Preisdaten werden mit Lieferanten digital synchronisiert (z. B. über EDI, Portal oder API).","type":"scale","category":"digital","required":true},
+        {"id":"A3","text":"Der Prozess für die technische Anbindung neuer Partner (Onboarding) ist standardisiert und dokumentiert.","type":"scale","category":"digital","required":true},
+        {"id":"A4","text":"Wir nutzen KI, um Eingangsbelege und Dokumente von Lieferanten automatisch zu erkennen, auszulesen und den richtigen Vorgängen zuzuordnen.","type":"scale","category":"ai","required":true},
+        {"id":"A5","text":"Wir nutzen KI, um Abweichungen und Risiken in der Beschaffung früh zu erkennen und geeignete Maßnahmen vorzuschlagen.","type":"scale","category":"ai","required":true},
+        {"id":"A6","text":"Wir nutzen KI, um Bedarfe und Bestellvorschläge zu unterstützen.","type":"scale","category":"ai","required":true}
+      ]
+    },
+    {
+      "id":"B",
+      "title":"B. Interne Systeme",
+      "radarLabel":"Interne Systeme",
+      "hasAiQuestions":true,
+      "questions":[
+        {"id":"B1","text":"Kernsysteme tauschen Daten automatisch über Schnittstellen aus.","type":"scale","category":"digital","required":true},
+        {"id":"B2","text":"Geschäftsprozesse laufen vom Auftrag bis zur Rechnung weitgehend automatisiert durch die Systeme.","type":"scale","category":"digital","required":true},
+        {"id":"B3","text":"Die Datenpflege ist zentral geregelt und wird konsistent auf alle betroffenen Systeme verteilt.","type":"scale","category":"digital","required":true},
+        {"id":"B4","text":"Wir nutzen KI, um interne Routinetätigkeiten zu unterstützen oder zu automatisieren.","type":"scale","category":"ai","required":true},
+        {"id":"B5","text":"Wir nutzen KI, um Datenqualität zu verbessern.","type":"scale","category":"ai","required":true}
+      ]
+    },
+    {
+      "id":"C",
+      "title":"C. Kunden & Markt",
+      "radarLabel":"Kunden & Markt",
+      "hasAiQuestions":true,
+      "questions":[
+        {"id":"C1","text":"Wir kennen alle digitalen Kundenkontaktpunkte und nutzen sie.","type":"scale","category":"digital","required":true},
+        {"id":"C2","text":"Kunden können Aufträge oder Statusabfragen digital tätigen.","type":"scale","category":"digital","required":true},
+        {"id":"C3","text":"Versand- und Logistikpartner sind digital angebunden.","type":"scale","category":"digital","required":true},
+        {"id":"C4","text":"Rechnungsstellung und Zahlungsabwicklung erfolgen elektronisch und weitgehend automatisch.","type":"scale","category":"digital","required":true},
+        {"id":"C5","text":"Wir nutzen KI zur Unterstützung der Angebotserstellung.","type":"scale","category":"ai","required":true},
+        {"id":"C6","text":"Wir nutzen KI im Marketing.","type":"scale","category":"ai","required":true},
+        {"id":"C7","text":"Wir nutzen KI im Kundenservice.","type":"scale","category":"ai","required":true}
+      ]
+    },
+    {
+      "id":"D",
+      "title":"D. Wissensmanagement & Dokumentation",
+      "radarLabel":"Wissensmanagement",
+      "hasAiQuestions":true,
+      "questions":[
+        {"id":"D1","text":"Die digitalen Datenflüsse sind grafisch für Dritte nachvollziehbar dokumentiert.","type":"scale","category":"digital","required":true},
+        {"id":"D2","text":"Anleitungen, Ansprechpartner und technische Details sind an einem zentralen Ort hinterlegt.","type":"scale","category":"digital","required":true},
+        {"id":"D3","text":"Die Prozesse sind so aufbereitet, dass neue Mitarbeitende sich ohne längere Einweisung einarbeiten können.","type":"scale","category":"digital","required":true},
+        {"id":"D4","text":"Mitarbeitende können einen internen KI-Assistenten nutzen, um Antworten zu Prozessen, Systemen oder Dokumentation schnell zu finden.","type":"scale","category":"ai","required":true}
+      ]
+    },
+    {
+      "id":"E",
+      "title":"E. Rahmenbedingungen",
+      "radarLabel":"Rahmenbedingungen",
+      "hasAiQuestions":false,
+      "questions":[
+        {"id":"E1","text":"Es existiert eine stabile technische Basis zur Verwaltung der Verbindungen.","type":"scale","category":"digital","required":true},
+        {"id":"E2","text":"Verschlüsselung, Zugriffsschutz und Audit-Logging sind für alle Schnittstellen aktiv.","type":"scale","category":"digital","required":true},
+        {"id":"E3","text":"Es gibt eine Überwachung der Schnittstellen und definierte Mechanismen für die Fehlerbehandlung.","type":"scale","category":"digital","required":true}
+      ]
+    },
+    {
+      "id":"F",
+      "title":"F. Unterstützungsstrategie",
+      "radarLabel":"Strategie",
+      "hasAiQuestions":false,
+      "questions":[
+        {"id":"F1","text":"Rollen und Support-Level für den Betrieb sind klar definiert.","type":"scale","category":"digital","required":true},
+        {"id":"F2","text":"Mitarbeitende erhalten gezielte Schulungen zum Umgang mit den digitalen Schnittstellen.","type":"scale","category":"digital","required":true},
+        {"id":"F3","text":"Es gibt geplante Budgets und Prioritäten für die Weiterentwicklung der digitalen Infrastruktur.","type":"scale","category":"digital","required":true}
+      ]
+    }
+  ],
+  "recommendations": [
+    {"scope":"overall","below":50,"text":"Gesamt betrachtet besteht hoher Handlungsbedarf. Priorisieren Sie zunächst Basisprozesse, Standards und Verantwortlichkeiten."},
+    {"scope":"digital","below":50,"text":"Die Digitalisierungsbasis sollte gestärkt werden, bevor komplexere KI-Anwendungen eingeführt werden."},
+    {"scope":"ai","below":25,"text":"KI-Potenziale sind noch wenig erschlossen. Starten Sie mit klar abgegrenzten Pilotfällen in Bereichen mit guter Datenbasis."},
+    {"scope":"section:A","below":50,"text":"Im Bereich Lieferanten & Partner sollten digitale Schnittstellen und Stammdatenprozesse priorisiert werden."},
+    {"scope":"section:D","below":50,"text":"Wissensmanagement und Dokumentation sollten verbessert werden, um Personenabhängigkeiten zu reduzieren."}
+  ]
+}
