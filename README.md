@@ -26,7 +26,6 @@ config.json     Zentrale Konfiguration
 2. Fragen, Blöcke, Scoring, Empfehlungen bearbeiten.
 3. `config.json herunterladen` klicken.
 4. Die heruntergeladene Datei im Repository ersetzen.
-5. GitHub Pages lädt danach automatisch die neue Version.
 
 ## Vorschau
 
